@@ -3,8 +3,6 @@ Project: Secure Data Hiding in Images using Enhanced LSB Steganography
 
 Author: Tanmay
 
-Period: August 10 - September 27, 2025
-
 Week 1: Research & Environment Setup
 Objective: The primary goal for the first week was to establish a stable development environment and gain a thorough understanding of the foundational concepts of LSB (Least Significant Bit) steganography.
 

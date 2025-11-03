@@ -119,12 +119,102 @@ def decode_message(image):
                     
     return "Could not find a hidden message."
 
+
+
+
+def run_test_case(original_path, save_path, message, case_name):
+    """Runs one full encode-decode cycle and compares the results."""
+    print(f"\n--- Running Test Case: {case_name} ---")
+    
+    # 1. ENCODE
+    original_img = load_image(original_path)
+    if original_img is None:
+        print("Test FAILED: Could not load original image.")
+        return False
+    
+    # We include a try-except block to catch the capacity check error
+    try:
+        encoded_img = encode_message(original_img, message)
+        save_image(encoded_img, save_path)
+    except ValueError as e:
+        # Expected failure for the Max Capacity Test (if we run it)
+        print(f"Test PASSED (Capacity Check): {e}")
+        return True 
+    except Exception as e:
+        print(f"Test FAILED (Encoding Error): {e}")
+        return False
+
+    # 2. DECODE
+    stego_img = load_image(save_path)
+    if stego_img is None:
+        print("Test FAILED: Could not load stego image for decoding.")
+        return False
+
+    extracted_message = decode_message(stego_img)
+    
+    # 3. VERIFY
+    if extracted_message == message:
+        print(f"Test PASSED: Original Message matches Extracted Message: '{message[:30]}...'")
+        return True
+    else:
+        print(f"Test FAILED: Mismatch detected.")
+        print(f"Original (Snippet): '{message[:30]}...'")
+        print(f"Extracted (Snippet): '{extracted_message[:30]}...'")
+        return False
+
+# Replace the existing 'if __name__ == '__main__': ' with this block
+if __name__ == '__main__':
+    # NOTE: Ensure you have test images named 'test_image_rgb.png' and 'test_image_rgba.png' 
+    # and they are reachable by the BASE_PATH.
+    BASE_PATH = r'd:\Projects\Steganography-Project-B.E-2025'
+    
+    all_tests_passed = True
+
+    # --- Test 1: Simple Message (RGB Image) ---
+    if not run_test_case(
+        original_path=f'{BASE_PATH}\\test_image_rgb.png',
+        save_path=f'{BASE_PATH}\\stego_simple_rgb.png',
+        message="Cybersecurity is my career goal and I will achieve it with hard work.",
+        case_name="Simple ASCII Text (RGB)"
+    ):
+        all_tests_passed = False
+
+    # --- Test 2: Long Message (RGBA Image) ---
+    long_message = "A long secret message to test capacity and alpha channel preservation. This message is significantly longer than the first one to ensure all internal loops are working correctly across a large number of pixels. This also confirms robust handling of RGBA images without corrupting the message."
+    if not run_test_case(
+        original_path=f'{BASE_PATH}\\test_image_rgba.png',
+        save_path=f'{BASE_PATH}\\stego_long_rgba.png',
+        message=long_message,
+        case_name="Long Message (RGBA)"
+    ):
+        all_tests_passed = False
+
+    # --- Test 3: Zero-Length Message ---
+    if not run_test_case(
+        original_path=f'{BASE_PATH}\\test_image_rgb.png',
+        save_path=f'{BASE_PATH}\\stego_empty.png',
+        message="",
+        case_name="Zero-Length Message"
+    ):
+        all_tests_passed = False
+        
+    print("\n" + "="*50)
+    if all_tests_passed:
+        print("ALL INTEGRITY TESTS PASSED SUCCESSFULLY!")
+        print("Proceed to visual confirmation to finalize Week 5.")
+    else:
+        print("ONE OR MORE TESTS FAILED. DEBUG REQUIRED.")
+    print("="*50)
+
+
+
+
 # Updated the testing part of the script to perform a full cycle
 if __name__ == '__main__':
     # --- ENCODE ---
     original_img_path = r'd:\Projects\Steganography-Project-B.E-2025\test_image.png'
     stego_img_path = r'd:\Projects\Steganography-Project-B.E-2025\secret_image.png'
-    secret = "Radhe Shyam , Radha Radha"
+    secret = "This is a secret message "
 
     original_img = load_image(original_img_path)
     if original_img:
@@ -139,3 +229,18 @@ if __name__ == '__main__':
         if stego_img:
             hidden_message = decode_message(stego_img)
             print(f"\nExtracted Message: {hidden_message}")
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+

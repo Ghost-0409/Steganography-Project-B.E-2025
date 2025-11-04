@@ -153,3 +153,43 @@ Challenges Faced: Ensuring file paths on Windows were handled correctly to avoid
 Solutions and Improvements: Used Python's raw strings (e.g., r'C:\path\to\file.png') during testing to make file path handling more reliable.
 
 Outcome: The project now has a complete encode-decode cycle. A message can be embedded with an EOF marker and perfectly retrieved. The core application logic is complete.
+
+
+**Week 5 (Sep 7 - Sep 13): Testing Core Functionality & Debugging**
+
+**Objective:** To rigorously validate the entire LSB encode/decode cycle (Weeks 3 & 4) using automated test cases and confirm the stego-image remains visually identical to the cover image.
+
+**Process and Implementation:**
+
+- **Automated Testing Suite:** A new function, `run_test_case`, was implemented to automate the full workflow (encode, save, decode, and comparison) for a given message and image path.
+- **Test Case Development:** Three critical test scenarios were created and executed within the main block:
+    * Simple ASCII message (RGB image).
+    * Longer message to stress-test the data embedding loops (RGBA image).
+    * Zero-length message to ensure the `EOF_MARKER` is handled correctly at the start of the process.
+- **Integrity Check:** The script automatically confirmed that the extracted message was **perfectly identical** to the original message for all test cases, validating the LSB and EOF logic.
+
+**Code Snippet (Testing Driver):**
+
+```python
+# Python from steganography_core.py - Snippet of run_test_case function
+def run_test_case(original_path, save_path, message, case_name):
+    # ... code for ENCODE (with try/except for capacity) ...
+    # ... code for DECODE ...
+    # 3. VERIFY
+    if extracted_message == message:
+        print(f"Test PASSED: Original Message matches Extracted Message: '{message[:30]}...'")
+        return True
+    # ... else failed ...
+```
+
+Challenges Faced:
+
+GitHub Authentication: The planned GitHub push failed due to a conflict between two local GitHub accounts, resulting in a 403 (Forbidden) error (Permission denied).
+
+Solutions and Improvements:
+
+The issue was resolved by manually clearing the incorrect cached login credentials from the Windows Credential Manager. This forced Git to prompt for a new login, allowing the correct account to be used for repository access.
+
+Successful commit and push to GitHub confirmed the integrity of the project's version control workflow.
+
+Outcome: The core LSB encoding and decoding functions were successfully validated against multiple test cases, confirming perfect data integrity and robust RGB/RGBA handling. The project is now stable and ready for the security enhancements planned in Week 6.

@@ -193,3 +193,32 @@ The issue was resolved by manually clearing the incorrect cached login credentia
 Successful commit and push to GitHub confirmed the integrity of the project's version control workflow.
 
 Outcome: The core LSB encoding and decoding functions were successfully validated against multiple test cases, confirming perfect data integrity and robust RGB/RGBA handling. The project is now stable and ready for the security enhancements planned in Week 6.
+
+### Week 6 : Encryption Layer (Part 1)
+
+**Objective:** To research and implement a simple, symmetric encryption function (XOR) to add the first layer of security to the secret message before embedding.
+
+**Process and Implementation:**
+
+* **Cipher Selection:** The **XOR cipher** was chosen for its simplicity, speed, and symmetric nature (the same function is used for encryption and decryption).
+* **`xor_encrypt` Function:** This function was implemented to take a plaintext message and a string key. It performs a character-by-character XOR operation, cycling through the key using the modulo operator (`%`).
+* **Symmetric Property:** The logic was immediately confirmed to also serve as the decryption function (`xor_decrypt`), reinforcing the symmetric design choice.
+* **Stand-alone Testing:** The main execution block (`if __name__ == '__main__':`) was updated with a dedicated test case to verify that an encrypted message could be successfully decrypted back to the original message using the same key.
+
+**Code Snippet (Encryption Function):**
+
+```python
+# Python from steganography_core.py - Snippet of xor_encrypt function
+def xor_encrypt(plaintext, key):
+    ciphertext = ""
+    key_len = len(key)
+    for i in range(len(plaintext)):
+        plain_char_code = ord(plaintext[i])
+        key_char_code = ord(key[i % key_len])
+        encrypted_char_code = plain_char_code ^ key_char_code
+        ciphertext += chr(encrypted_char_code)
+    return ciphertext
+
+def xor_decrypt(ciphertext, key):
+    return xor_encrypt(ciphertext, key) # Symmetric property
+```    

@@ -222,3 +222,35 @@ def xor_encrypt(plaintext, key):
 def xor_decrypt(ciphertext, key):
     return xor_encrypt(ciphertext, key) # Symmetric property
 ```    
+Challenges Faced: No significant technical challenges were faced during the implementation of the core XOR logic, as the algorithm is mathematically straightforward. The primary task was ensuring correct handling of character code conversions (ord() and chr()).
+
+Solutions and Improvements: Immediate unit testing in the if __name__ == '__main__': block confirmed the integrity of the encryption/decryption loop.
+
+Outcome: The XOR encryption layer is successfully implemented and validated for standalone operation. The project is now ready to integrate this encryption into the main encoding and decoding workflow in Week 7.
+
+### Week 7 : Encryption Layer (Part 2)
+
+**Objective:** To integrate the standalone XOR encryption and decryption modules (from Week 6) into the main steganography workflow, creating a fully secure encoding and decoding pipeline.
+
+**Process and Implementation:**
+
+* **Function Signature Modification:** Both `encode_message` and `decode_message` functions were modified to accept a `key` parameter. This key is now mandatory for both hiding and revealing the message, strengthening security.
+* **Encoding Integration:** Inside `encode_message`, the plaintext message is now passed through the `xor_encrypt` function *before* it is converted to binary and embedded into the image pixels.
+* **Decoding Integration:** Inside `decode_message`, the extracted message (which is the ciphertext) is now passed through the `xor_decrypt` function *after* it is reconstructed from binary, revealing the original plaintext.
+* **Testing Update:** The `run_test_case` function and all associated calls in the main execution block were updated to include the `key` argument, validating the full secure cycle (Encode $\rightarrow$ Encrypt $\rightarrow$ Embed $\rightarrow$ Extract $\rightarrow$ Decrypt $\rightarrow$ Decode).
+
+**Code Snippet (Encoding Integration):**
+
+```python
+# Python from steganography_core.py - Snippet of encode_message function
+def encode_message(image, secret_message, key): # NEW key parameter
+    # ...
+    encrypted_message = xor_encrypt(secret_message, key)
+    message_binary = ''.join(format(ord(char), '08b') for char in encrypted_message)
+    # ... rest of embedding logic
+
+Challenges Faced: The primary adjustment was ensuring that the data conversion steps (ord(), chr(), and binary manipulation) correctly handled the output of the XOR operation, which may produce non-printable characters, but all were handled seamlessly by Python's string conversion.
+
+Solutions and Improvements: Successful execution of the full testing suite confirmed that the integrated, encrypted workflow perfectly maintains data integrity.
+
+Outcome: The project now has a functional, two-layer security mechanism (LSB + XOR Encryption). The message is now protected both during transit (by LSB) and against casual extraction (by encryption). The core application logic is finalized.    

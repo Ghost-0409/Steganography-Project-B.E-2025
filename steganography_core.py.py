@@ -5,7 +5,7 @@ from PIL import Image
 # MODIFICATION: Define the EOF marker as a binary string
 EOF_MARKER = '1111111111111110'  # 16 bits unlikely to appear in normal text
 
-# WEEK 5 ADDITIONS: XOR Encryption and Decryption Functions
+# WEEK 5 
 def xor_encrypt(plaintext, key):
     """
     Encrypts a message using a simple XOR cipher with a string key.
@@ -86,16 +86,24 @@ def save_image(image_object, save_path):
         image_object.save(save_path)
         print(f"Image saved successfully to '{save_path}'.")
 
-def encode_message(image, secret_message):
+def encode_message(image, secret_message, key=None):
     """
     Hides a secret message within an image using the LSB technique.
+    If `key` is provided the message will be XOR-encrypted before embedding.
     Returns a new Image object with the message embedded.
     """
     width, height = image.size
-    
-    message_binary = ''.join(format(ord(char), '08b') for char in secret_message)
-    
-    # MODIFICATION: Add the EOF marker to the end of the message
+
+    # NEW STEP: Encrypt the message before conversion (if a key is provided)
+    if key is not None:
+        encrypted_message = xor_encrypt(secret_message, key)
+    else:
+        encrypted_message = secret_message
+
+    # MODIFIED: Use the encrypted message for binary conversion
+    message_binary = ''.join(format(ord(char), '08b') for char in encrypted_message)
+
+    # Add the EOF marker to the end of the message
     message_binary += EOF_MARKER
     
     max_bits = width * height * 3
@@ -141,62 +149,83 @@ def encode_message(image, secret_message):
     return encoded_image
 
 # NEW FUNCTION FOR WEEK 4
-def decode_message(image):
+def decode_message(image, key=None):
     """
     Extracts a secret message from an image.
+    If `key` is provided, the extracted message is decrypted with XOR using that key.
     """
     width, height = image.size
     pixel_map = image.load()
-    
+
     extracted_bits = ""
-    
+
     for y in range(height):
         for x in range(width):
             pixel = pixel_map[x, y]
-            
+
             # Extract LSB from R, G, B channels
             for color_val in pixel[:3]:
                 # The '& 1' operation gets the LSB
                 extracted_bits += str(color_val & 1)
-                
+
                 # Check if the extracted bits end with our EOF marker
                 if extracted_bits.endswith(EOF_MARKER):
                     print("EOF marker found. Decoding complete.")
                     # Remove the marker from the bit string
                     message_binary = extracted_bits[:-len(EOF_MARKER)]
-                    
+
                     # Convert binary string back to characters
                     message = ""
                     for i in range(0, len(message_binary), 8):
                         byte = message_binary[i:i+8]
                         if len(byte) == 8:
                             message += chr(int(byte, 2))
-                    
+
+                    # NEW STEP: Decrypt the message before returning if a key is provided
+                    if key is not None:
+                        try:
+                            decrypted_message = xor_decrypt(message, key)
+                            return decrypted_message
+                        except Exception as e:
+                            print(f"Decryption failed: {e}")
+                            # Fall back to returning the raw extracted message
+                            return message
+
+                    # If no key provided, return the raw extracted message
                     return message
-                    
+
     return "Could not find a hidden message."
 
 
 
 
-def run_test_case(original_path, save_path, message, case_name):
-    """Runs one full encode-decode cycle and compares the results."""
+def run_test_case(original_path, save_path, message, key, case_name):
+    """Runs one full encode-decode cycle and compares the results.
+
+    Parameters:
+      - original_path: path to cover image
+      - save_path: where to write stego image
+      - message: plaintext message to hide
+      - key: secret key used for XOR encrypt/decrypt
+      - case_name: human readable name for the test
+    """
     print(f"\n--- Running Test Case: {case_name} ---")
-    
+
     # 1. ENCODE
     original_img = load_image(original_path)
     if original_img is None:
         print("Test FAILED: Could not load original image.")
         return False
-    
+
     # We include a try-except block to catch the capacity check error
     try:
-        encoded_img = encode_message(original_img, message)
+        # Pass the key to encode_message so the message is encrypted before embedding
+        encoded_img = encode_message(original_img, message, key)
         save_image(encoded_img, save_path)
     except ValueError as e:
         # Expected failure for the Max Capacity Test (if we run it)
         print(f"Test PASSED (Capacity Check): {e}")
-        return True 
+        return True
     except Exception as e:
         print(f"Test FAILED (Encoding Error): {e}")
         return False
@@ -207,8 +236,9 @@ def run_test_case(original_path, save_path, message, case_name):
         print("Test FAILED: Could not load stego image for decoding.")
         return False
 
-    extracted_message = decode_message(stego_img)
-    
+    # Pass the key to decode_message so the extracted ciphertext is decrypted
+    extracted_message = decode_message(stego_img, key)
+
     # 3. VERIFY
     if extracted_message == message:
         print(f"Test PASSED: Original Message matches Extracted Message: '{message[:30]}...'")
@@ -224,6 +254,8 @@ if __name__ == '__main__':
     # NOTE: Ensure you have test images named 'test_image_rgb.png' and 'test_image_rgba.png' 
     # and they are reachable by the BASE_PATH.
     BASE_PATH = r'd:\Projects\Steganography-Project-B.E-2025'
+    # Define a consistent secret key used by the test suite
+    SECRET_KEY = "cybermentoring2025"
     
     all_tests_passed = True
 
@@ -232,7 +264,8 @@ if __name__ == '__main__':
         original_path=f'{BASE_PATH}\\test_image_rgb.png',
         save_path=f'{BASE_PATH}\\stego_simple_rgb.png',
         message="Cybersecurity is my career goal and I will achieve it with hard work.",
-        case_name="Simple ASCII Text (RGB)"
+        key=SECRET_KEY,
+        case_name="Simple ASCII Text (RGB) - Encrypted"
     ):
         all_tests_passed = False
 
@@ -242,7 +275,8 @@ if __name__ == '__main__':
         original_path=f'{BASE_PATH}\\test_image_rgba.png',
         save_path=f'{BASE_PATH}\\stego_long_rgba.png',
         message=long_message,
-        case_name="Long Message (RGBA)"
+        key=SECRET_KEY,
+        case_name="Long Message (RGBA) - Encrypted"
     ):
         all_tests_passed = False
 
@@ -251,7 +285,8 @@ if __name__ == '__main__':
         original_path=f'{BASE_PATH}\\test_image_rgb.png',
         save_path=f'{BASE_PATH}\\stego_empty.png',
         message="",
-        case_name="Zero-Length Message"
+        key=SECRET_KEY,
+        case_name="Zero-Length Message - Encrypted"
     ):
         all_tests_passed = False
         

@@ -8,6 +8,24 @@
 
 **Author:** Tanmay
 
+
+**Outcome:** The project now has a complete encode-decode cycle. A message can be embedded with an EOF marker and perfectly retrieved. The core application logic is complete.
+
+# Project Log: Secure Data Hiding in Images
+
+**Project:** Secure Data Hiding in Images using Enhanced LSB Steganography
+
+**Author:** Tanmay
+
+---
+
+## 📚 August 2025: Foundation and Core Logic
+# Project Log: Secure Data Hiding in Images
+
+**Project:** Secure Data Hiding in Images using Enhanced LSB Steganography
+
+**Author:** Tanmay
+
 ---
 
 ## 📚 August 2025: Foundation and Core Logic
@@ -18,11 +36,11 @@
 
 **Process and Implementation:**
 
-* **Python Installation:** The latest stable version of Python was installed.
-* **IDE Setup:** Visual Studio Code was selected as the Integrated Development Environment.
-* **Library Installation:** Two key Python libraries were installed using `pip`: **Pillow** (PIL Fork) and **NumPy**.
-* **Theoretical Research:** Studied the principles of LSB steganography.
-* **Image Format Selection:** Chose the lossless **PNG** format to prevent corruption of hidden data during compression.
+- **Python Installation:** The latest stable version of Python was installed.
+- **IDE Setup:** Visual Studio Code was selected as the Integrated Development Environment.
+- **Library Installation:** Two key Python libraries were installed using `pip`: **Pillow** (PIL Fork) and **NumPy**.
+- **Theoretical Research:** Studied the principles of LSB steganography.
+- **Image Format Selection:** Chose the lossless **PNG** format to prevent corruption of hidden data during compression.
 
 **Challenges Faced:** The `python --version` command failed in the terminal, indicating the system's PATH variable was not correctly configured.
 
@@ -38,9 +56,9 @@
 
 **Process and Implementation:**
 
-* **Version Control:** A Git repository was created on GitHub and cloned locally.
-* **File Structure:** The main logic file, `steganography.py` (later renamed to `steganography_core.py`), was created.
-* **Image I/O Functions:** Implemented `load_image` and `save_image` using the Pillow library.
+- **Version Control:** A Git repository was created on GitHub and cloned locally.
+- **File Structure:** The main logic file, `steganography.py` (later renamed to `steganography_core.py`), was created.
+- **Image I/O Functions:** Implemented `load_image` and `save_image` using the Pillow library.
 
 ```python
 # From steganography_core.py
@@ -53,7 +71,7 @@ def load_image(image_path):
 def save_image(image_object, save_path):
     """Saves the given Image object to the specified path."""
     # ... implementation details ...
-````
+```
 
 **Challenges Faced:** Git commands failed with a `fatal: not a git repository` error because the terminal was not in the correct project directory.
 
@@ -61,7 +79,7 @@ def save_image(image_object, save_path):
 
 **Outcome:** A version-controlled project structure is now in place, with the fundamental ability to open and save images.
 
------
+---
 
 ### Week 3: Core LSB Encoding
 
@@ -69,11 +87,9 @@ def save_image(image_object, save_path):
 
 **Process and Implementation:** The `encode_message` function was developed to:
 
-  * Convert the secret message into a binary string.
-  * Check for message capacity within the image.
-  * Iterate through pixels, modifying the LSB of each color channel (R, G, B) to embed the message bits.
-
-<!-- end list -->
+  - Convert the secret message into a binary string.
+  - Check for message capacity within the image.
+  - Iterate through pixels, modifying the LSB of each color channel (R, G, B) to embed the message bits.
 
 ```python
 # From steganography_core.py - Snippet from encode_message function
@@ -93,7 +109,7 @@ def encode_message(image, secret_message):
 
 **Outcome:** A robust `encode_message` function that can embed a secret message into both RGB and RGBA images.
 
------
+---
 
 ## 🔐 September 2025: Extraction and Security
 
@@ -103,10 +119,8 @@ def encode_message(image, secret_message):
 
 **Process and Implementation:**
 
-  * **EOF Marker:** A unique 16-bit End-of-File marker (`1111111111111110`) is now appended to the secret message before encoding.
-  * **Decoding Function:** The `decode_message` function was created to reverse the process, extract the LSBs, and stop when it finds the `EOF_MARKER`.
-
-<!-- end list -->
+  - **EOF Marker:** A unique 16-bit End-of-File marker (`1111111111111110`) is now appended to the secret message before encoding.
+  - **Decoding Function:** The `decode_message` function was created to reverse the process, extract the LSBs, and stop when it finds the `EOF_MARKER`.
 
 ```python
 # From steganography_core.py - decode_message function
@@ -119,13 +133,13 @@ def decode_message(image):
     # ...
 ```
 
-**Challenges Faced:** Ensuring file paths on Windows were handled correctly to avoid issues with backslash `\` escape characters.
+**Challenges Faced:** Ensuring file paths on Windows were handled correctly to avoid issues with backslash `\\` escape characters.
 
-**Solutions and Improvements:** Used Python's raw strings (e.g., `r'C:\path\to\file.png'`) during testing to make file path handling more reliable.
+**Solutions and Improvements:** Used Python's raw strings (e.g., `r'C:\\path\\to\\file.png'`) during testing to make file path handling more reliable.
 
 **Outcome:** The project now has a complete encode-decode cycle. A message can be embedded with an EOF marker and perfectly retrieved. The core application logic is complete.
 
------
+---
 
 ### Week 5 (Sep 7 - Sep 13): Testing Core Functionality & Debugging
 
@@ -133,14 +147,12 @@ def decode_message(image):
 
 **Process and Implementation:**
 
-  * **Automated Testing Suite:** A new function, `run_test_case`, was implemented to automate the full workflow (encode, save, decode, and comparison) for a given message and image path.
-  * **Test Case Development:** Three critical test scenarios were created and executed within the main block:
-      * Simple ASCII message (RGB image).
-      * Longer message to stress-test the data embedding loops (RGBA image).
-      * Zero-length message to ensure the `EOF_MARKER` is handled correctly at the start of the process.
-  * **Integrity Check:** The script automatically confirmed that the extracted message was **perfectly identical** to the original message for all test cases, validating the LSB and EOF logic.
-
-**Code Snippet (Testing Driver):**
+  - **Automated Testing Suite:** A new function, `run_test_case`, was implemented to automate the full workflow (encode, save, decode, and comparison) for a given message and image path.
+  - **Test Case Development:** Three critical test scenarios were created and executed within the main block:
+      - Simple ASCII message (RGB image).
+      - Longer message to stress-test the data embedding loops (RGBA image).
+      - Zero-length message to ensure the `EOF_MARKER` is handled correctly at the start of the process.
+  - **Integrity Check:** The script automatically confirmed that the extracted message was **perfectly identical** to the original message for all test cases, validating the LSB and EOF logic.
 
 ```python
 # Python from steganography_core.py - Snippet of run_test_case function
@@ -160,8 +172,8 @@ def run_test_case(original_path, save_path, message, case_name):
 
 **Outcome:** The core LSB encoding and decoding functions were successfully validated against multiple test cases, confirming perfect data integrity and robust RGB/RGBA handling. The project is now stable and ready for the security enhancements planned in Week 6.
 
------
+---
 
-Now that your project log is perfectly formatted and up-to-date, we can officially move to the next phase of development\!
+Now that your project log is properly formatted and up-to-date, we can move to the next phase of development.
 
 Are you ready to start planning the code for **Week 6: Encryption Layer (Part 1)**?

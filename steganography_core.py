@@ -1,9 +1,9 @@
-# steganography.py
-
 from PIL import Image
 
 # MODIFICATION: Define the EOF marker as a binary string
 EOF_MARKER = '1111111111111110'  # 16 bits unlikely to appear in normal text
+
+# --- FUNCTION DEFINITIONS ---
 
 # WEEK 5 
 def xor_encrypt(plaintext, key):
@@ -39,28 +39,6 @@ def xor_decrypt(ciphertext, key):
     """
     # Since XOR is symmetric, encryption = decryption
     return xor_encrypt(ciphertext, key)
-
-# Now, update your main execution block for testing:
-if __name__ == '__main__':
-    # Add a simple test for the new encryption functions here:
-    test_key = "secret_key_123"
-    original_message = "Hello Mentor, this is a secret test message."
-    
-    encrypted_msg = xor_encrypt(original_message, test_key)
-    decrypted_msg = xor_decrypt(encrypted_msg, test_key)
-    
-    print("\n--- Encryption Test ---")
-    print(f"Original:   {original_message}")
-    print(f"Encrypted:  {encrypted_msg}")
-    print(f"Decrypted:  {decrypted_msg}")
-    
-    if original_message == decrypted_msg:
-        print("XOR Encryption Test PASSED: Decrypted message matches original.")
-    else:
-        print("XOR Encryption Test FAILED.")
-    
-    # ... Rest of your existing Week 5 testing code (run_test_case calls) ...
-
 
 def load_image(image_path):
     """
@@ -196,9 +174,6 @@ def decode_message(image, key=None):
 
     return "Could not find a hidden message."
 
-
-
-
 def run_test_case(original_path, save_path, message, key, case_name):
     """Runs one full encode-decode cycle and compares the results.
 
@@ -249,8 +224,30 @@ def run_test_case(original_path, save_path, message, key, case_name):
         print(f"Extracted (Snippet): '{extracted_message[:30]}...'")
         return False
 
-# Replace the existing 'if __name__ == '__main__': ' with this block
+# --- CONSOLIDATED MAIN EXECUTION ---
+# This is the *only* if __name__ == '__main__': block.
+# It should be at the very end of the file.
 if __name__ == '__main__':
+    
+    # --- Part 1: XOR Encryption Test ---
+    test_key = "secret_key_123"
+    original_message = "Hello Mentor, this is a secret test message."
+    
+    encrypted_msg = xor_encrypt(original_message, test_key)
+    decrypted_msg = xor_decrypt(encrypted_msg, test_key)
+    
+    print("\n--- Encryption Test ---")
+    print(f"Original:   {original_message}")
+    print(f"Encrypted:  {encrypted_msg}")
+    print(f"Decrypted:  {decrypted_msg}")
+    
+    if original_message == decrypted_msg:
+        print("XOR Encryption Test PASSED: Decrypted message matches original.")
+    else:
+        print("XOR Encryption Test FAILED.")
+
+    # --- Part 2: Full Steganography Test Suite ---
+    
     # NOTE: Ensure you have test images named 'test_image_rgb.png' and 'test_image_rgba.png' 
     # and they are reachable by the BASE_PATH.
     BASE_PATH = r'd:\Projects\Steganography-Project-B.E-2025'
@@ -258,10 +255,10 @@ if __name__ == '__main__':
     SECRET_KEY = "cybermentoring2025"
     
     all_tests_passed = True
-
+ 
     # --- Test 1: Simple Message (RGB Image) ---
     if not run_test_case(
-        original_path=f'{BASE_PATH}\\test_image_rgb.png',
+        original_path=f'{BASE_PATH}\\test_image.png',
         save_path=f'{BASE_PATH}\\stego_simple_rgb.png',
         message="Cybersecurity is my career goal and I will achieve it with hard work.",
         key=SECRET_KEY,
@@ -272,7 +269,7 @@ if __name__ == '__main__':
     # --- Test 2: Long Message (RGBA Image) ---
     long_message = "A long secret message to test capacity and alpha channel preservation. This message is significantly longer than the first one to ensure all internal loops are working correctly across a large number of pixels. This also confirms robust handling of RGBA images without corrupting the message."
     if not run_test_case(
-        original_path=f'{BASE_PATH}\\test_image_rgba.png',
+        original_path=f'{BASE_PATH}\\test_image.png',
         save_path=f'{BASE_PATH}\\stego_long_rgba.png',
         message=long_message,
         key=SECRET_KEY,
@@ -282,7 +279,7 @@ if __name__ == '__main__':
 
     # --- Test 3: Zero-Length Message ---
     if not run_test_case(
-        original_path=f'{BASE_PATH}\\test_image_rgb.png',
+        original_path=f'{BASE_PATH}\\test_image.png',
         save_path=f'{BASE_PATH}\\stego_empty.png',
         message="",
         key=SECRET_KEY,
@@ -297,35 +294,6 @@ if __name__ == '__main__':
     else:
         print("ONE OR MORE TESTS FAILED. DEBUG REQUIRED.")
     print("="*50)
-
-
-
-
-# Updated the testing part of the script to perform a full cycle
-if __name__ == '__main__':
-    # --- ENCODE ---
-    original_img_path = r'd:\Projects\Steganography-Project-B.E-2025\test_image.png'
-    stego_img_path = r'd:\Projects\Steganography-Project-B.E-2025\secret_image.png'
-    secret = "This is a secret message "
-
-    original_img = load_image(original_img_path)
-    if original_img:
-        print("\n--- Encoding Process ---")
-        encoded_img = encode_message(original_img, secret)
-        if encoded_img:
-            save_image(encoded_img, stego_img_path)
-    
-        # --- DECODE ---
-        print("\n--- Decoding Process ---")
-        stego_img = load_image(stego_img_path)
-        if stego_img:
-            hidden_message = decode_message(stego_img)
-            print(f"\nExtracted Message: {hidden_message}")
-            
-
-
-
-
 
 
 

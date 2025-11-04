@@ -5,6 +5,63 @@ from PIL import Image
 # MODIFICATION: Define the EOF marker as a binary string
 EOF_MARKER = '1111111111111110'  # 16 bits unlikely to appear in normal text
 
+# WEEK 5 ADDITIONS: XOR Encryption and Decryption Functions
+def xor_encrypt(plaintext, key):
+    """
+    Encrypts a message using a simple XOR cipher with a string key.
+    
+    The key is repeated if the plaintext is longer than the key.
+    Note: The output is a string of characters, not a binary string.
+    """
+    ciphertext = ""
+    key_len = len(key)
+    
+    for i in range(len(plaintext)):
+        # Get the character code of the message character
+        plain_char_code = ord(plaintext[i])
+        
+        # Get the character code of the key character (using modulo to cycle the key)
+        key_char_code = ord(key[i % key_len])
+        
+        # Perform the XOR operation
+        encrypted_char_code = plain_char_code ^ key_char_code
+        
+        # Convert the resulting integer back to a character and append
+        ciphertext += chr(encrypted_char_code)
+        
+    return ciphertext
+
+def xor_decrypt(ciphertext, key):
+    """
+    Decrypts a message using the same XOR cipher and key.
+    
+    XOR decryption is the same operation as encryption (symmetric property).
+    """
+    # Since XOR is symmetric, encryption = decryption
+    return xor_encrypt(ciphertext, key)
+
+# Now, update your main execution block for testing:
+if __name__ == '__main__':
+    # Add a simple test for the new encryption functions here:
+    test_key = "secret_key_123"
+    original_message = "Hello Mentor, this is a secret test message."
+    
+    encrypted_msg = xor_encrypt(original_message, test_key)
+    decrypted_msg = xor_decrypt(encrypted_msg, test_key)
+    
+    print("\n--- Encryption Test ---")
+    print(f"Original:   {original_message}")
+    print(f"Encrypted:  {encrypted_msg}")
+    print(f"Decrypted:  {decrypted_msg}")
+    
+    if original_message == decrypted_msg:
+        print("XOR Encryption Test PASSED: Decrypted message matches original.")
+    else:
+        print("XOR Encryption Test FAILED.")
+    
+    # ... Rest of your existing Week 5 testing code (run_test_case calls) ...
+
+
 def load_image(image_path):
     """
     Opens and loads an image from the specified path.

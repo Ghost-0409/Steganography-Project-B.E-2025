@@ -1,9 +1,9 @@
-Project Log: Secure Data Hiding in Images
-Project: Secure Data Hiding in Images using Enhanced LSB Steganography
+### Project Log: Secure Data Hiding in Images
+### Project: Secure Data Hiding in Images using Enhanced LSB Steganography
 
 Author: Tanmay
 
-Week 1: Research & Environment Setup
+### Week 1: Research & Environment Setup
 Objective: The primary goal for the first week was to establish a stable development environment and gain a thorough understanding of the foundational concepts of LSB (Least Significant Bit) steganography.
 
 Process and Implementation:
@@ -32,16 +32,16 @@ Re-installing Python and ensuring the "Add Python to PATH" option was checked du
 
 Outcome: A fully functional Python development environment was established with a solid theoretical foundation for LSB steganography.
 
-Week 2: Project Scaffolding and File I/O
-Objective: To create the project's foundational structure, implement version control, and write functions for loading and saving image files.
+### Week 2: Project Scaffolding and File I/O
+**Objective:** To create the project's foundational structure, implement version control, and write functions for loading and saving image files.
 
-Process and Implementation:
+**Process and Implementation:**
 
-Version Control: A Git repository was created on GitHub and cloned locally to track project history.
+**Version Control:** A Git repository was created on GitHub and cloned locally to track project history.
 
-File Structure: The main logic file, steganography.py, was created.
+**File Structure:** The main logic file, steganography.py, was created.
 
-Image I/O Functions: Implemented load_image and save_image using the Pillow library.
+**Image I/O Functions:** Implemented load_image and save_image using the Pillow library.
 
 ```python
 # From steganography.py
@@ -63,14 +63,14 @@ def save_image(image_object, save_path):
 ```
 Challenges Faced: Git commands failed with a fatal: not a git repository error because the terminal was not in the correct project directory.
 
-Solutions and Improvements: Corrected the workflow by ensuring the terminal was navigated into the cloned repository folder (cd Steganography-Project-B.E-2025) before running any Git commands.
+**Solutions and Improvements:** Corrected the workflow by ensuring the terminal was navigated into the cloned repository folder (cd Steganography-Project-B.E-2025) before running any Git commands.
 
-Outcome: A version-controlled project structure is now in place, with the fundamental ability to open and save images.
+**Outcome:** A version-controlled project structure is now in place, with the fundamental ability to open and save images.
 
-Week 3: Core LSB Encoding
-Objective: To implement the core logic for encoding a secret text message into a cover image using the LSB technique.
+### Week 3: Core LSB Encoding
+**Objective:** To implement the core logic for encoding a secret text message into a cover image using the LSB technique.
 
-Process and Implementation: The encode_message function was developed to:
+**Process and Implementation:** The encode_message function was developed to:
 
 Convert the secret message into a binary string.
 
@@ -111,16 +111,16 @@ def encode_message(image, secret_message):
                 return encoded_image
     return encoded_image
 ```
-Challenges Faced: The initial code failed on PNG images with an Alpha (transparency) channel (RGBA), as it only expected three RGB values per pixel.
+**Challenges Faced:** The initial code failed on PNG images with an Alpha (transparency) channel (RGBA), as it only expected three RGB values per pixel.
 
-Solutions and Improvements: The code was updated to handle both RGB and RGBA images by slicing pixel[:3] to always read the first three channels and preserving the original Alpha channel on write.
+**Solutions and Improvements:** The code was updated to handle both RGB and RGBA images by slicing pixel[:3] to always read the first three channels and preserving the original Alpha channel on write.
 
-Outcome: A robust encode_message function that can embed a secret message into both RGB and RGBA images.
+**Outcome:** A robust encode_message function that can embed a secret message into both RGB and RGBA images.
 
-Week 4: Core LSB Decoding & Delimitation
-Objective: To implement the logic for extracting a hidden message from a stego-image and to add a delimiter to mark the end of the message.
+### Week 4: Core LSB Decoding & Delimitation
+**Objective:** To implement the logic for extracting a hidden message from a stego-image and to add a delimiter to mark the end of the message.
 
-Process and Implementation:
+**Process and Implementation:**
 
 EOF Marker: A unique 16-bit End-of-File marker (1111111111111110) is now appended to the secret message before encoding.
 
@@ -148,14 +148,14 @@ def decode_message(image):
                     return message
     return "No message found or EOF marker is missing."
 ```
-Challenges Faced: Ensuring file paths on Windows were handled correctly to avoid issues with backslash \ escape characters.
+**Challenges Faced:** Ensuring file paths on Windows were handled correctly to avoid issues with backslash \ escape characters.
 
-Solutions and Improvements: Used Python's raw strings (e.g., r'C:\path\to\file.png') during testing to make file path handling more reliable.
+**Solutions and Improvements:** Used Python's raw strings (e.g., r'C:\path\to\file.png') during testing to make file path handling more reliable.
 
-Outcome: The project now has a complete encode-decode cycle. A message can be embedded with an EOF marker and perfectly retrieved. The core application logic is complete.
+**Outcome:** The project now has a complete encode-decode cycle. A message can be embedded with an EOF marker and perfectly retrieved. The core application logic is complete.
 
 
-**Week 5 : Testing Core Functionality & Debugging**
+### Week 5 : Testing Core Functionality & Debugging
 
 **Objective:** To rigorously validate the entire LSB encode/decode cycle (Weeks 3 & 4) using automated test cases and confirm the stego-image remains visually identical to the cover image.
 
@@ -248,9 +248,67 @@ def encode_message(image, secret_message, key): # NEW key parameter
     encrypted_message = xor_encrypt(secret_message, key)
     message_binary = ''.join(format(ord(char), '08b') for char in encrypted_message)
     # ... rest of embedding logic
+```
 
 Challenges Faced: The primary adjustment was ensuring that the data conversion steps (ord(), chr(), and binary manipulation) correctly handled the output of the XOR operation, which may produce non-printable characters, but all were handled seamlessly by Python's string conversion.
 
 Solutions and Improvements: Successful execution of the full testing suite confirmed that the integrated, encrypted workflow perfectly maintains data integrity.
 
-Outcome: The project now has a functional, two-layer security mechanism (LSB + XOR Encryption). The message is now protected both during transit (by LSB) and against casual extraction (by encryption). The core application logic is finalized.    
+Outcome: The project now has a functional, two-layer security mechanism (LSB + XOR Encryption). The message is now protected both during transit (by LSB) and against casual extraction (by encryption). The core application logic is finalized.
+
+
+### Week 8: Interactive User Interface (CLI)
+
+Objective: To refactor the main execution block from a developer-focused test suite into an interactive, user-facing command-line tool, making the application demonstrable and usable.
+
+Process and Implementation:
+
+Refactored if __name__ == '__main__':: Removed all test-running code and replaced it with a single call to a new main() function. This cleans up the global scope and makes the script's entry point singular and clear.
+
+Created main() function: This function provides a persistent main menu loop (while True:), which presents the user with the main options (Encode, Decode, Exit) and handles their choice.
+
+Created handle_encode() function: This function encapsulates the entire encoding workflow. It guides the user step-by-step, prompting for:
+
+The original image path
+
+The secret message
+
+An optional encryption key
+
+The desired output filename
+It also includes input validation to prevent errors from empty messages or keys.
+
+Created handle_decode() function: This function encapsulates the decoding workflow, prompting for the stego-image and the optional key. It then prints the extracted message directly to the console.
+
+Code Snippet (Main Menu Logic):
+
+```python
+# Python from steganography.py - Snippet of main menu
+def main():
+    """
+    Main function to run the interactive menu.
+    """
+    print("\n--- LSB Steganography Tool ---")
+    while True:
+        print("\nWhat would you like to do?")
+        print("  1. Hide (encode) a message in an image")
+        print("  2. Find (decode) a message from an image")
+        print("  3. Exit")
+        
+        choice = input("Enter your choice (1, 2, or 3): ").strip()
+
+        if choice == '1':
+            handle_encode()
+        elif choice == '2':
+            handle_decode()
+        elif choice == '3':
+            print("\nGoodbye!")
+            sys.exit()
+        else:
+            print("\n  Invalid choice. Please enter 1, 2, or 3.")
+```
+Challenges Faced: The primary challenge was ensuring the user experience was smooth and the program wouldn't crash from bad input. This was solved by adding simple checks in handle_encode and handle_decode (e.g., if not secret_message:), which provide clear error messages to the user instead of failing.
+
+Solutions and Improvements: The new interactive menu is robust and user-friendly. It neatly separates the core logic (the encode/decode functions) from the user interface (the handle/main functions). This is an excellent software design principle known as "Separation of Concerns."
+
+Outcome: The project has evolved from a Python script (for a developer) into a complete, demonstrable tool (for an end-user). It is now ready for live presentation and is a significantly stronger piece for your GitHub portfolio. This completes the core development of this project.
